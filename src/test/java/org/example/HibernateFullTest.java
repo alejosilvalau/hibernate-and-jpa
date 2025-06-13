@@ -56,9 +56,9 @@ public class HibernateFullTest {
 
 	   session = sessionFactory.openSession();
 	   session.beginTransaction();
-	   List<User> result = session.createQuery( "select u from User u" , User.class).list();
+	   List<User> result = session.createQuery( "SELECT u FROM user u" , User.class).list();
 	   for ( User user : result) {
-		  System.out.println( "User (" + user.getName() + ") : " + user.getBirthDate() );
+		  System.out.println( "user (" + user.getName() + ") : " + user.getBirthDate() );
 	   }
 	   session.getTransaction().commit();
 	   session.close();
