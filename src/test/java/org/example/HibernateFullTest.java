@@ -45,7 +45,6 @@ public class HibernateFullTest {
 	   }
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testBasicUsage() {
 	   // create a couple of events...
