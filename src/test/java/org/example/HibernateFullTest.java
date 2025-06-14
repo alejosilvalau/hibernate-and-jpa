@@ -8,6 +8,7 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -21,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class HibernateFullTest {
 
   private SessionFactory sessionFactory;
+
 
   @BeforeEach
   protected void setUp() throws Exception {
@@ -36,12 +38,14 @@ public class HibernateFullTest {
     }
   }
 
+
   @AfterEach
   protected void tearDown() throws Exception {
     if (sessionFactory != null) {
       sessionFactory.close();
     }
   }
+
 
   @Test
   public void testBasicUsage() {
@@ -64,6 +68,7 @@ public class HibernateFullTest {
     session.close();
   }
 
+
   @Test
   public void marco_is_in_the_house() {
     assertThat(1).isGreaterThanOrEqualTo(0);
@@ -75,8 +80,19 @@ public class HibernateFullTest {
 
     try (Session session = sessionFactory.openSession()) {
       session.beginTransaction();
-
       session.persist(user);
+      session.getTransaction().commit();
+    }
+  }
+
+  @Test
+  void hql_fetch_users() {
+    try (Session session = sessionFactory.openSession()) {
+      session.beginTransaction();
+      session.createQuery("SELECT u FROM User u", User.class)
+          .list()
+          .forEach(user -> System.out.println("user (" + user.getName() + ") : " + user.getBirthDate()));
+
       session.getTransaction().commit();
 
     }
