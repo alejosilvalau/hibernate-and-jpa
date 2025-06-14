@@ -20,52 +20,65 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class HibernateFullTest {
 
-    private SessionFactory sessionFactory;
+  private SessionFactory sessionFactory;
 
-    @BeforeEach
-    protected void setUp() throws Exception {
-	   // A SessionFactory is set up once for an application!
-	   final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
-			 .configure() // configures settings from hibernate.cfg.xml
-			 .build();
-	   try {
-		  sessionFactory = new MetadataSources( registry ).buildMetadata().buildSessionFactory();
-	   }
-	   catch (Exception e) {
-		  // The registry would be destroyed by the SessionFactory, but we had trouble building the SessionFactory
-		  // so destroy it manually.
-		  StandardServiceRegistryBuilder.destroy( registry );
-	   }
+  @BeforeEach
+  protected void setUp() throws Exception {
+    // A SessionFactory is set up once for an application!
+    final StandardServiceRegistry registry = new StandardServiceRegistryBuilder().configure().build();
+    try {
+      sessionFactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
+    } catch (Exception e) {
+      // The registry would be destroyed by the SessionFactory, but we had trouble
+      // building the SessionFactory
+      // so destroy it manually.
+      StandardServiceRegistryBuilder.destroy(registry);
     }
+  }
 
-    @AfterEach
-    protected void tearDown() throws Exception {
-	   if ( sessionFactory != null ) {
-		  sessionFactory.close();
-	   }
+  @AfterEach
+  protected void tearDown() throws Exception {
+    if (sessionFactory != null) {
+      sessionFactory.close();
     }
+  }
 
-    @Test
-    public void testBasicUsage() {
-	   // create a couple of events...
-	   Session session = sessionFactory.openSession();
-	   session.beginTransaction();
-	   session.remove(new User("Marco's Friend", LocalDate.now()));
-	   session.getTransaction().commit();
-	   session.close();
+  @Test
+  public void testBasicUsage() {
+    Session session = sessionFactory.openSession();
 
-	   session = sessionFactory.openSession();
-	   session.beginTransaction();
-	   List<User> result = session.createQuery( "SELECT u FROM user u" , User.class).list();
-	   for ( User user : result) {
-		  System.out.println( "user (" + user.getName() + ") : " + user.getBirthDate() );
-	   }
-	   session.getTransaction().commit();
-	   session.close();
+    session.beginTransaction();
+    session.remove(new User("Marco's Friend", LocalDate.now()));
+    session.getTransaction().commit();
+    session.close();
+
+    session = sessionFactory.openSession();
+    session.beginTransaction();
+
+    List<User> result = session.createQuery("FROM User", User.class).list();
+
+    for (User user : result) {
+      System.out.println("user (" + user.getName() + ") : " + user.getBirthDate());
     }
+    session.getTransaction().commit();
+    session.close();
+  }
 
-    @Test
-    public void marco_is_in_the_house() {
-	   assertThat(1).isGreaterThanOrEqualTo(0);
+  @Test
+  public void marco_is_in_the_house() {
+    assertThat(1).isGreaterThanOrEqualTo(0);
+  }
+
+  @Test
+  void save_my_first_object_to_the_db() {
+    Object user = new User("Marco", LocalDate.of(1980, 1, 1));
+
+    try (Session session = sessionFactory.openSession()) {
+      session.beginTransaction();
+
+      session.persist(user);
+      session.getTransaction().commit();
+
     }
+  }
 }

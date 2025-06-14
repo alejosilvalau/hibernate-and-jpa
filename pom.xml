@@ -55,11 +55,11 @@
 		  <artifactId>hibernate-jpamodelgen</artifactId>
 		  <version>6.1.1.Final</version>
 	   </dependency>
-	   <dependency>
+	  <dependency>
 		  <groupId>org.glassfish.jaxb</groupId>
 		  <artifactId>jaxb-runtime</artifactId>
 		  <version>4.0.0</version>
-	   </dependency>
+	  </dependency>
 
     </dependencies>
 
