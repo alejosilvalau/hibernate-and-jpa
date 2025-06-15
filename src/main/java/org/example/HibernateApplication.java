@@ -10,61 +10,37 @@ import java.util.List;
 public class HibernateApplication {
 
   public static void main(String[] args) {
-    // Regular application setup
+    // Create session factory
     SessionFactory factory = new Configuration()
         .configure("hibernate.cfg.xml")
         .buildSessionFactory();
 
     try {
+      // Create a session and start transaction
+      Session session = factory.openSession();
+      session.beginTransaction();
+
       System.out.println("Hibernate application running!");
 
-      // Run tests manually
-      runTests(factory);
+      // Verify schema was created by trying to save a user
+      User user = new User("Test User", LocalDate.now());
+      session.persist(user);
+      System.out.println("User saved with ID: " + user.getId());
 
+      // Query to verify the user was saved
+      List<User> users = session.createQuery("FROM User", User.class).list();
+      System.out.println("Users in database: " + users.size());
+      for (User u : users) {
+        System.out.println("User: " + u.getName() + ", Birth date: " + u.getBirthDate());
+      }
+
+      // Commit the transaction
+      session.getTransaction().commit();
+
+    } catch (Exception e) {
+      e.printStackTrace();
     } finally {
       factory.close();
     }
-  }
-
-  private static void runTests(SessionFactory factory) {
-    System.out.println("\n=== Running Application Tests ===");
-
-    try {
-      // Test 1: Create User
-      Long userId = createUserTest(factory);
-
-      // Test 2: Retrieve User
-      retrieveUserTest(factory, userId);
-
-      System.out.println("=== All Tests Passed ===\n");
-    } catch (AssertionError e) {
-      System.err.println("Test failed: " + e.getMessage());
-    }
-  }
-
-  private static Long createUserTest(SessionFactory factory) {
-    Session session = factory.getCurrentSession();
-    session.beginTransaction();
-
-    User user = new User("Test User", LocalDate.now());
-    session.persist(user);
-
-    session.getTransaction().commit();
-
-    System.out.println("Test 1 - Create User: PASSED (ID: " + user.getId() + ")");
-    return user.getId();
-  }
-
-  private static void retrieveUserTest(SessionFactory factory, Long userId) {
-    Session session = factory.getCurrentSession();
-    session.beginTransaction();
-
-    User user = session.find(User.class, userId);
-    if (user == null) {
-      throw new AssertionError("User not found with ID: " + userId);
-    }
-
-    System.out.println("Test 2 - Retrieve User: PASSED (Name: " + user.getName() + ")");
-    session.getTransaction().commit();
   }
 }

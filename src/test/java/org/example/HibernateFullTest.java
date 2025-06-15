@@ -8,7 +8,6 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -91,8 +90,11 @@ public class HibernateFullTest {
       session.beginTransaction();
       session.createQuery("SELECT u FROM User u", User.class)
           .list()
-          .forEach(user -> System.out.println("user (" + user.getName() + ") : " + user.getBirthDate()));
+          .forEach((u) -> System.out.println(
+              "User: " + u.getName() + ", Birthdate: " + u.getBirthDate()));
 
+      System.out.println("Number of users: " +
+          session.createQuery("SELECT COUNT(u) FROM User u", Long.class).getSingleResult());
       session.getTransaction().commit();
 
     }
