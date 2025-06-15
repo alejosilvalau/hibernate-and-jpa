@@ -3,9 +3,13 @@ package org.example;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
+
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -81,5 +85,21 @@ public class JPAFullTest {
 
     // Commit transaction
     em.getTransaction().commit();
+  }
+
+  @Test
+  public void criteriaAPI() {
+    CriteriaBuilder cb = em.getCriteriaBuilder();
+    assertNotNull(cb, "CriteriaBuilder should not be null");
+
+    // Begin transaction
+    CriteriaQuery<User> criteriaQuery = cb.createQuery(User.class);
+    Root<User> root = criteriaQuery.from(User.class);
+    criteriaQuery.select(root).where(cb.equal(root.get("name"), "JPA Test User"));
+
+    // Execute query
+    TypedQuery<User> query = em.createQuery(criteriaQuery);
+    List<User> results = query.getResultList();
+    results.forEach(System.out::println);
   }
 }
